@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -20,15 +22,21 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val jsonData = loadData(resources)
-        val data = dataFromJsonString(jsonData)
+
         setContent {
             LabsTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    /*
-                    Display the items from the Json file in a LazyColumn
-                     */
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    val jsonData = loadData(resources)
+                    val data = dataFromJsonString(jsonData)
+                    LazyColumn{
+                        items(data){ player ->
+                            Text(text = "${player.giveName} ${player.familyName}, Age: ${player.age}")
+                        }
+                    }
                 }
             }
         }
@@ -43,8 +51,8 @@ private fun loadData(resources: Resources): String {
 }
 
 @OptIn(ExperimentalStdlibApi::class)
-private fun dataFromJsonString(json: String): List</* put your data class name here */> {
+private fun dataFromJsonString(json: String): List<Player> {/* put your data class name here */
     val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
-    val jsonAdapter: JsonAdapter<List</* put your data class name here */>> = moshi.adapter()
-    return jsonAdapter.fromJson(json) ?: listOf()
+    val jsonAdapter: JsonAdapter<List<Player>> = moshi.adapter()/* put your data class name here */
+    return jsonAdapter.fromJson(json) ?: emptyList()
 }
